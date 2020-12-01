@@ -1,7 +1,8 @@
+from setuptools import setup
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-s.setup(
+setup(
     name="maskpass",
     version="0.2.0",
     description="getpass alternative with masking and additional features",
@@ -11,7 +12,7 @@ s.setup(
     author="Aman Anifer",
     author_email="amananiferfiaff@gmail.com",
     license="MIT",
-    keywords=["password","cryptography","getpass","getpass3","mask","spyder","input"]
+    keywords=["password","cryptography","getpass","getpass3","mask","spyder","input"],
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
