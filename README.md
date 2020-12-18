@@ -27,7 +27,7 @@ Use ` mask=""` for not echoing anything into the terminal. (Like entering sudo p
 
 The function returns the entered password in string format
 
-### For Spyder/QtConsole
+### Using advpass function
 
 ```python
 import maskpass
