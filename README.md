@@ -12,7 +12,7 @@ pip install maskpass
 ```
 
 ### Usage
-This module contains functions askpass() and advpass()
+This module contains functions askpass() and advpass()  
 askpass() uses msvcrt.getch() in windows and altenatives in *nix OS, but it doesn't work in Spyder
 advpass() uses [pynput](https://pypi.org/project/pynput/) to get the password, and it works in Spyder too!
 
