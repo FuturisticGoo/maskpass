@@ -4,15 +4,15 @@ with open("README.md", "r") as fh:
 
 setup(
     name="maskpass",
-    version="0.2.0",
-    description="getpass alternative with masking and additional features",
+    version="0.3.0",
+    description="getpass alternative with masking, Spyder support and additional features ",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/FuturisticGoo/maskpass",
     author="Aman Anifer",
-    author_email="amananiferfiaff@gmail.com",
+    author_email="fgoo.edu@hash.fyi",
     license="MIT",
-    keywords=["password","cryptography","getpass","getpass3","mask","spyder","input"],
+    keywords=["password","cryptography","getpass","getpass3","mask","spyder","input","pynput"],
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",

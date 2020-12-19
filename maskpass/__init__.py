@@ -1,15 +1,43 @@
 # -*- coding: utf-8 -*-
-
 """
-Function askpass() and special_askpass() which accepts two optional arguments prompt and mask.
+Library maskpass with two functions askpass and advpass
 """
-
 import sys
 import platform
+import threading
 
-__all__=["askpass","special_askpass"]
+__all__ = ["askpass", "advpass"]
 
-def askpass(prompt="Enter Password: ",mask="*"):
+
+def toggle(thing):
+    # Simple true/false toggler function
+    if(thing):
+        thing = False
+    else:
+        thing = True
+    return thing
+
+
+if(platform.system() == "Windows"):
+    import msvcrt
+    is_windows = True
+else:
+    # Little bit different for Linux or macOS
+    def posix_getch():
+        import termios
+        import tty
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch.encode()
+    is_windows = False
+
+
+def askpass(prompt="Enter Password: ", mask="*"):
     """
     Description
     ----------
@@ -19,76 +47,61 @@ def askpass(prompt="Enter Password: ",mask="*"):
     ----------
     prompt : String, optional
         DESCRIPTION. The default is "Enter Password: ".
-        
+
     mask : String, optional
-        DESCRIPTION. Masks the input password. 
-                     The default is "*", "" can be used for no masking - nothing gets printed. 
+        DESCRIPTION. Masks the input password.
+                     The default is "*", "" can be used for
+                     no masking like in Unix passwords.
                      Single length string preferred, multi length string works.
 
     Returns
     -------
-    Returns the entered password in string format. Returns empty string "" if CTRL+C or ESC pressed
+    Returns the entered password in string format.
+    Returns empty string "" if CTRL+C or ESC pressed
     """
-    
-    if(platform.system()=="Windows"):
-        import msvcrt
-        is_windows=True
-    else:   #Little bit different for Linux or macOS
-        def posix_getch():
-            import tty, termios
-            fd = sys.stdin.fileno()
-            old_settings = termios.tcgetattr(fd)
-            try:
-                tty.setraw(sys.stdin.fileno())
-                ch = sys.stdin.read(1)
-            finally:
-                termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-            return ch.encode()
-        is_windows=False
-    
-    char=b""
-    password_input=b""
-    count=0
-    
-    print(prompt,end="",flush=True)
-    
+
+    char = b""
+    password_input = b""
+    count = 0
+
+    print(prompt, end="", flush=True)
+
     while(True):
-        
         if(is_windows):
-            char=msvcrt.getch()
+            char = msvcrt.getch()
         else:
-            char=posix_getch()    
-        if(char==b"\x03" or char==b"\x1b"):
-            password_input=b""
-            break    
-        elif(char==b"\r"):
+            char = posix_getch()
+        if(char == b"\x03" or char == b"\x1b"):
+            password_input = b""
             break
-        elif(char==b"\x08" or char==b"\x7f"):
-            if(count!=0):
+        elif(char == b"\r"):
+            break
+        elif(char == b"\x08" or char == b"\x7f"):
+            if(count != 0):
                 sys.stdout.write("\b \b"*len(mask))
                 sys.stdout.flush()
-                count-=1
-            password_input=password_input[:-1]
+                count -= 1
+            password_input = password_input[:-1]
         else:
             sys.stdout.write(mask)
             sys.stdout.flush()
-            if(mask!=""):
-                count+=1 
-            password_input+=char
+            if(mask != ""):
+                count += 1
+            password_input += char
     print()
     return password_input.decode()
 
-def special_askpass(prompt="Enter Password: ",mask="*"):
-    """
-    
 
+def advpass(prompt="Enter Password: ", mask="*", idle=False):
+    """
     Parameters
     ----------
     prompt : The prompt shown for asking password, optional
         DESCRIPTION. The default is "Enter Password: ".
     mask : The masking character, use "" for max security, optional
         DESCRIPTION. The default is "*".
-
+    idle : Pass True if getch or linux getch not supported like in Spyder
+        DESCRIPTION. Default is False
     Raises
     ------
     KeyboardInterrupt
@@ -100,63 +113,76 @@ def special_askpass(prompt="Enter Password: ",mask="*"):
         Returns the entered password as string type
 
     """
-    
-    def toggle(thing):
-        if(thing):
-            thing=False
-        else:
-            thing=True
-        return thing
-    
     from pynput import keyboard
-    
-    print(prompt,end="")
-    
-    reveal=False
-    count=0
-    password_input=""
-    
+
+    print(prompt, end="", flush=True)
+
+    reveal = False
+    count = 0
+    password_input = ""
+
     def on_press(key):
-        nonlocal password_input,count,reveal
+        nonlocal password_input, count, reveal
         try:
-            if(key.char in ["\x03","\x1b"]):
+            if(key.char in ["\x03", "\x1b"]):
                 raise KeyboardInterrupt
             else:
-                password_input+=key.char
-                char=key.char if reveal else mask
-                print(char,end="",flush=True)
-                if(char!=""):
-                    count+=1
+                password_input += key.char
+                char = key.char if reveal else mask
+                print(char, end="", flush=True)
+                if(char != ""):
+                    count += 1
         except AttributeError:
-            if(key==keyboard.Key.enter):
+            if(key == keyboard.Key.enter):
                 return False
-            elif(key==keyboard.Key.space):
-                char=" " if reveal else mask
-                print(char,end="",flush=True)
-                password_input+=" "
-            elif(key==keyboard.Key.backspace):
-                password_input=password_input[:-1]
-                if(count!=0):
+            elif(key == keyboard.Key.space):
+                char = " " if reveal else mask
+                print(char, end="", flush=True)
+                password_input += " "
+            elif(key == keyboard.Key.backspace):
+                password_input = password_input[:-1]
+                if(count != 0):
                     if(sys.stdout.isatty()):
-                        print("\b \b"*len(mask),end="",flush=True)
+                        print("\b \b"*len(mask), end="", flush=True)
                     else:
-                        print("\b\u200c"*len(mask),end="",flush=True)
-                    count-=1
-            elif(key==keyboard.Key.ctrl_l):
-                reveal=toggle(reveal)
-                print("\b"*len(password_input),end="",flush=True)
+                        print("\b\u200c"*len(mask), end="", flush=True)
+                    count -= 1
+            elif(key == keyboard.Key.ctrl_l):
+                reveal = toggle(reveal)
+                print("\b"*len(password_input), end="", flush=True)
                 if(reveal):
-                    print(password_input,end="",flush=True)
+                    print(password_input, end="", flush=True)
                 else:
-                    print(mask*len(password_input),end="",flush=True)
+                    print(mask*len(password_input), end="", flush=True)
             else:
                 pass
-    with keyboard.Listener(
-            on_press=on_press) as listener:
-        listener.join()
+
+    def start_ask():
+        with keyboard.Listener(on_press=on_press) as listener:
+            listener.join()
+        # After this, password_input contains the password, so no need to
+        # return anything, also, we cannot return anything becuase we're
+        # calling this function from thread so no return
+
+    thread = threading.Thread(target=start_ask)
+    thread.start()
+
+    if(sys.stdout.isatty() and not idle):
+
+        if(is_windows):
+            while True:
+                if(msvcrt.getch() == b"\r"):
+                    break
+        else:
+            while True:
+                if(posix_getch() == b"\r"):
+                    break
+    else:
+        thread.join()
     print()
     return password_input
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     print(askpass(mask=""))
     input("Press any key to exit...")
