@@ -1,6 +1,6 @@
 # Maskpass
 
-Maskpass is a Python library like getpass but with advanced features like masking and reveal/unreveal
+Maskpass is a Python library like getpass but with advanced features like masking and reveal/unreveal.  
 It also supports Spyder IDLE
 
 ### Installation
@@ -13,7 +13,7 @@ pip install maskpass
 
 ### Usage
 This module contains functions askpass() and advpass()
-askpass() uses msvcrt.getch() in windows and altenatives in *nix OS, but it doesn't work in Spyder
+askpass() uses msvcrt.getch() in windows and altenatives in *nix OS, but it doesn't work in Spyder. 
 advpass() uses [pynput](https://pypi.org/project/pynput/) to get the password, and it works in Spyder too!
 
 ```python
@@ -22,17 +22,18 @@ password=maskpass.askpass()
 
 ```
 
-
+The function returns the entered password in string format
+Accepts 2 optional arguments prompt, mask and idle.  Default for prompt is `Enter password: `.  Default for mask is `*`.
 Use ` mask=""` for not echoing anything into the terminal. (Like entering sudo passwords in *nix)
 
-The function returns the entered password in string format
-
-### For Spyder/QtConsole
+### Using advpass()
 
 ```python
 import maskpass
 password=maskpass.advpass()
 ```
+The function returns the entered password in string format
+Accepts 3 optional arguments prompt, mask and idle.  Default for prompt is `Enter password: `.  Default for mask is `*`. idle expects a bool, it is for overriding IDLE check.
 
 `advpass()` also has a revealing feature which will toggle the visibility of the entered password when `Left CTRL` is pressed. Press it again to change back the visibility.
 Note: Only works with `advpass()` and needs [pynput](https://pypi.org/project/pynput/)
