@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 """
 Library maskpass with two functions askpass and advpass
 """
@@ -94,6 +95,11 @@ def askpass(prompt="Enter Password: ", mask="*"):
 
 def advpass(prompt="Enter Password: ", mask="*", idle=False):
     """
+    Description
+    ----------
+    An advanced version of the askpass which works in Spyder/Qtconsole and
+    has a revealing feature
+
     Parameters
     ----------
     prompt : The prompt shown for asking password, optional
@@ -117,18 +123,18 @@ def advpass(prompt="Enter Password: ", mask="*", idle=False):
 
     print(prompt, end="", flush=True)
 
-    reveal = False
+    to_reveal = False
     count = 0
     password_input = ""
 
     def on_press(key):
-        nonlocal password_input, count, reveal
+        nonlocal password_input, count, to_reveal
         try:
             if(key.char in ["\x03", "\x1b"]):
                 raise KeyboardInterrupt
             else:
                 password_input += key.char
-                char = key.char if reveal else mask
+                char = key.char if to_reveal else mask
                 print(char, end="", flush=True)
                 if(char != ""):
                     count += 1
@@ -136,24 +142,50 @@ def advpass(prompt="Enter Password: ", mask="*", idle=False):
             if(key == keyboard.Key.enter):
                 return False
             elif(key == keyboard.Key.space):
-                char = " " if reveal else mask
+                char = " " if to_reveal else mask
                 print(char, end="", flush=True)
                 password_input += " "
             elif(key == keyboard.Key.backspace):
                 password_input = password_input[:-1]
                 if(count != 0):
-                    if(sys.stdout.isatty()):
-                        print("\b \b"*len(mask), end="", flush=True)
+                    if(sys.stdout.isatty() and not idle):
+                        if(to_reveal):
+                            print("\b \b", end="", flush=True)
+                        else:
+                            print("\b \b"*len(mask), end="", flush=True)
                     else:
-                        print("\b\u200c"*len(mask), end="", flush=True)
+                        if(to_reveal):
+                            print("\b\u200c", end="", flush=True)
+                        else:
+                            print("\b\u200c"*len(mask), end="", flush=True)
                     count -= 1
             elif(key == keyboard.Key.ctrl_l):
-                reveal = toggle(reveal)
-                print("\b"*len(password_input), end="", flush=True)
-                if(reveal):
-                    print(password_input, end="", flush=True)
+                to_reveal = toggle(to_reveal)
+                if(mask == ""):
+                    if(to_reveal):
+                        print(password_input, end="", flush=True)
+                        count = len(password_input)
+                    else:
+                        if(sys.stdout.isatty() and not idle):
+                            print("\b \b"*len(password_input),
+                                  end="", flush=True)
+                        else:
+                            print(("\b"*len(password_input)) +
+                                  ("\u200c"*len(password_input)),
+                                  end="", flush=True)
+                        count = 0
                 else:
-                    print(mask*len(password_input), end="", flush=True)
+                    if(to_reveal):
+                        if(sys.stdout.isatty() and not idle):
+                            print(("\b \b"*len(password_input)*len(mask)) +
+                                  password_input, end="", flush=True)
+                        else:
+                            print(("\b"*len(password_input)*len(mask)) +
+                                  ("\u200c"*len(password_input)*len(mask)) +
+                                  password_input, end="", flush=True)
+                    else:
+                        print(("\b"*len(password_input)) +
+                              (mask*len(password_input)), end="", flush=True)
             else:
                 pass
 
@@ -184,5 +216,5 @@ def advpass(prompt="Enter Password: ", mask="*", idle=False):
 
 
 if __name__ == "__main__":
-    print(askpass(mask=""))
+    print(advpass(mask="*"))
     input("Press any key to exit...")

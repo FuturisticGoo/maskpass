@@ -1,21 +1,19 @@
 # Maskpass
 
-Maskpass is a Python library like getpass but with advanced features like masking and reveal/unreveal.  
-It also supports Spyder IDLE
+Maskpass is a Python library like getpass but with advanced features like masking and reveal/unreveal.   
+It also works in Spyder IDLE
 
 ### Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install maskpass.
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install [maskpass](https://pypi.org/project/maskpass/).
 
 ```bash
 pip install maskpass
 ```
 
 ### Usage
-This module contains functions askpass() and advpass()
+This module contains functions askpass() and advpass()  
 askpass() uses msvcrt.getch() in windows and altenatives in *nix OS, but it doesn't work in Spyder. 
-
-advpass() uses [pynput](https://pypi.org/project/pynput/) to get the password, and it works in Spyder too!
 
 ```python
 import maskpass
@@ -23,22 +21,25 @@ password=maskpass.askpass()
 
 ```
 
-The function returns the entered password in string format
-Accepts 2 optional arguments prompt, mask and idle.  Default for prompt is `Enter password: `.  Default for mask is `*`.
+The function returns the entered password in string format  
+Accepts 2 optional arguments prompt and mask.  Default for prompt is `Enter password: `.  Default for mask is `*`.  
 Use ` mask=""` for not echoing anything into the terminal. (Like entering sudo passwords in *nix)
 
-
 ### Using advpass()
+
+advpass() uses [pynput](https://pypi.org/project/pynput/) to get the password, and it works in Spyder too!
 
 
 ```python
 import maskpass
 password=maskpass.advpass()
 ```
-The function returns the entered password in string format
-Accepts 3 optional arguments prompt, mask and idle.  Default for prompt is `Enter password: `.  Default for mask is `*`. idle expects a bool, it is for overriding IDLE check.
+The function returns the entered password in string format.  
+Accepts 3 optional arguments prompt, mask and idle.  Default for prompt is `Enter password: `. Default for mask is `*`.
 
-`advpass()` also has a revealing feature which will toggle the visibility of the entered password when `Left CTRL` is pressed. Press it again to change back the visibility.
+idle expects a bool, it is for overriding IDLE check, and has default False. Usually there is no need to change this, since it's automatically checked whether it's running on IDLE or terminal.  
+
+`advpass()` also has a revealing feature which will toggle the visibility of the entered password when `Left CTRL` is pressed.       Press it again to change back the visibility.  
 Note: Only works with `advpass()` and needs [pynput](https://pypi.org/project/pynput/)
 
 ### Screenshots

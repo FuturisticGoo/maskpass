@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="maskpass",
-    version="0.3.0",
+    version="0.3.2",
     description="getpass alternative with masking, Spyder support and additional features ",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -20,6 +20,6 @@ setup(
     ],
     packages=["maskpass"],
     include_package_data=True,
-    install_requires=[],
+    install_requires=["pynput"],
     
 )
