@@ -3,7 +3,8 @@
 """
 # Library maskpass with two functions askpass and advpass.
 ## askpass
-     askpass uses standard library to get non blocking input and returns the password.
+     askpass uses standard library to get non blocking input and
+     returns the password.
      askpass doesn't work in some IDLEs like Spyder.
 ## advpass
      advpass uses pynput to get text and returns the password.
@@ -17,12 +18,14 @@ import threading
 
 __all__ = ["askpass", "advpass"]
 
-if(platform.system() == "Windows"):
+if platform.system() == "Windows":
     import msvcrt
-    is_windows = True
+    IS_WINDOWS = True
 else:
-    # Little bit different for Linux or macOS
     def posix_getch():
+        """
+        Alternative getch for posix
+        """
         import termios
         import tty
         fd = sys.stdin.fileno()
@@ -33,7 +36,7 @@ else:
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return ch.encode()
-    is_windows = False
+    IS_WINDOWS = False
 
 
 def askpass(prompt="Enter Password: ", mask="*"):
@@ -65,18 +68,18 @@ def askpass(prompt="Enter Password: ", mask="*"):
 
     print(prompt, end="", flush=True)
 
-    while(True):
-        if(is_windows):
+    while True:
+        if IS_WINDOWS:
             char = msvcrt.getch()
         else:
             char = posix_getch()
-        if(char == b"\x03" or char == b"\x1b"):
+        if char in [b"\x03", b"\x1b"]:
             password_input = b""
             break
-        elif(char == b"\r"):
+        elif char == b"\r":
             break
-        elif(char == b"\x08" or char == b"\x7f"):
-            if(count != 0):
+        elif char in [b"\x08", b"\x7f"]:
+            if count != 0:
                 sys.stdout.write("\b \b"*len(mask))
                 sys.stdout.flush()
                 count -= 1
@@ -84,7 +87,7 @@ def askpass(prompt="Enter Password: ", mask="*"):
         else:
             sys.stdout.write(mask)
             sys.stdout.flush()
-            if(mask != ""):
+            if mask != "":
                 count += 1
             password_input += char
     print(flush=True)
@@ -118,10 +121,10 @@ def advpass(prompt="Enter Password: ", mask="*", idle=False):
 
     """
     from pynput import keyboard
-    
+
     def toggle(thing):
         # Simple true/false toggler function
-        if(thing):
+        if thing:
             thing = False
         else:
             thing = True
@@ -138,7 +141,7 @@ def advpass(prompt="Enter Password: ", mask="*", idle=False):
         nonlocal password_input, count, to_reveal
 
         try:
-            if(key.char in ["\x03", "\x1b"]):
+            if key.char in ["\x03", "\x1b"]:
                 # CTRL+C character
                 raise KeyboardInterrupt
             else:
@@ -147,49 +150,50 @@ def advpass(prompt="Enter Password: ", mask="*", idle=False):
                 # entered is printed, else, the masking character is printed
                 char = key.char if to_reveal else mask
                 print(char, end="", flush=True)
-                if(char != ""):
+                if char != "":
                     count += 1
 
         except AttributeError:
-            if(key == keyboard.Key.enter):
+            if key == keyboard.Key.enter:
                 # End listening
                 return False
-            elif(key == keyboard.Key.space):
+            elif key == keyboard.Key.space:
                 char = " " if to_reveal else mask
                 print(char, end="", flush=True)
                 password_input += " "
                 count += 1
-            elif(key == keyboard.Key.backspace):
+            elif key == keyboard.Key.backspace:
                 password_input = password_input[:-1]
-                if(count != 0):
+                if count != 0:
                     # In Spyder IDLE, backspace character doesn't
                     # work as expected for this, but a combination
-                    # of backspace and \u200c works. So 
+                    # of backspace and \u200c works. So
                     # sys.stdout.isatty() is used to check whether
                     # it's the IDLE console or not.
-                    if(sys.stdout.isatty() and not idle):
-                        if(to_reveal):
+                    if sys.stdout.isatty() and not idle:
+                        if to_reveal:
                             print("\b \b", end="", flush=True)
                         else:
                             # Handling different length masking character
                             print("\b \b"*len(mask), end="", flush=True)
                     else:
-                        if(to_reveal):
+                        if to_reveal:
                             print("\b\u200c", end="", flush=True)
                         else:
                             # Handling different length masking character
-                            print("\b\u200c"*len(mask), end="", flush=True)
+                            print(("\b"*len(mask))+("\u200c"*len(mask)),
+                                  end="", flush=True)
                     count -= 1
-            elif(key == keyboard.Key.ctrl_l):
-                # Fancy way of revealing/unrevealing the characters 
+            elif key == keyboard.Key.ctrl_l:
+                # Fancy way of revealing/unrevealing the characters
                 # entered by pressing CTRL key
                 to_reveal = toggle(to_reveal)
-                if(mask == ""):
+                if mask == "":
                     # If mask is "", then that means nothing has been
                     # printed while typing. So no need to remove characters
-                    # from screen. Just straight up print the stuff 
+                    # from screen. Just straight up print the stuff
                     # typed before
-                    if(to_reveal):
+                    if to_reveal:
                         print(password_input, end="", flush=True)
                         count = len(password_input)
                     else:
@@ -203,13 +207,13 @@ def advpass(prompt="Enter Password: ", mask="*", idle=False):
                                   end="", flush=True)
                         count = 0
                 else:
-                    # If the mask isn't "", then something has been 
+                    # If the mask isn't "", then something has been
                     # printed on the screen and we need to remove it
                     # before printing the previously entered text
-                    if(to_reveal):
+                    if to_reveal:
                         # The masking character could be multilength.
                         # So we print destructive backspace character
-                        # times the length of previously entered 
+                        # times the length of previously entered
                         # text times the length of masking character
                         # to remove it completely
                         if(sys.stdout.isatty() and not idle):
@@ -240,14 +244,14 @@ def advpass(prompt="Enter Password: ", mask="*", idle=False):
 
     if(sys.stdout.isatty() and not idle):
         # You see, if you're using advpass in normal console, it's
-        # actually listening to the input in background, sort of like a 
+        # actually listening to the input in background, sort of like a
         # keylogger. So while you're focussing on the console and typing
         # into that, pynput is collecting input from the background,
-        # at the same time the console is keeping the input in buffer waiting 
+        # at the same time the console is keeping the input in buffer waiting
         # to put text into the console. The problem here is that, after
         # using advpass, the entered text will get put into the console
         # when it allows input afterwards. So, if you call advpass first
-        # and then input(), we will get the password_input return from 
+        # and then input(), we will get the password_input return from
         # advpass, but the entered text will also get into the input()
         # But things work differently in Spyder. It doesn't keep it in
         # in buffer. So, to work in both the environments, we use a
@@ -255,13 +259,13 @@ def advpass(prompt="Enter Password: ", mask="*", idle=False):
         # which will run simultaneously with the background input
         # listening so as to remove it from buffer. It will stop
         # when Enter is pressed.
-        if(is_windows):
+        if IS_WINDOWS:
             while True:
-                if(msvcrt.getch() == b"\r"):
+                if msvcrt.getch() == b"\r":
                     break
         else:
             while True:
-                if(posix_getch() == b"\r"):
+                if posix_getch() == b"\r":
                     break
     else:
         thread.join()
