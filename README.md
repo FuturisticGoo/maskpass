@@ -1,7 +1,7 @@
 # Maskpass
 
 Maskpass is a Python library like getpass but with advanced features like masking and reveal/unreveal.   
-It also works in Spyder IDLE
+It also works in Spyder IDE
 
 ### Installation
 
@@ -17,7 +17,7 @@ askpass() uses msvcrt.getch() in windows and altenatives in *nix OS, but it does
 
 ```python
 import maskpass
-password=maskpass.askpass()
+password = maskpass.askpass()
 
 ```
 
@@ -32,17 +32,24 @@ advpass() uses [pynput](https://pypi.org/project/pynput/) to get the password, a
 
 ```python
 import maskpass
-password=maskpass.advpass()
+password = maskpass.advpass()
 ```
 The function returns the entered password in string format.  
-Accepts 3 optional arguments prompt, mask and idle.  Default for prompt is `Enter password: `. Default for mask is `*`.
+Accepts 3 optional arguments prompt, mask and ide.  Default for prompt is `Enter password: `. Default for mask is `*`.
 
-idle expects a bool, it is for overriding IDLE check, and has default False. Usually there is no need to change this, since it's automatically checked whether it's running on IDLE or terminal.  
+ide expects a bool, it is for overriding IDE check, and has default False. Usually there is no need to change this, since it's automatically checked whether it's running on IDE or terminal.  
 
 `advpass()` also has a revealing feature which will toggle the visibility of the entered password when `Left CTRL` is pressed.       Press it again to change back the visibility.  
 Note: Only works with `advpass()` and needs [pynput](https://pypi.org/project/pynput/)
 
+## Exceptions and other returns
+
+In both askpass and advpass, pressing `Ctrl+C` raise the usual `KeyboardInterrupt`.  
+
+Also, pressing `Escape` in both functions stops the input and returns an empty string `""`. 
+
 ### Screenshots
+
 ![Example GIF](https://raw.githubusercontent.com/FuturisticGoo/maskpass/main/images/example.gif)
 >Normal askpass
 
@@ -57,7 +64,7 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 ### Issues
 Currently I have only tested it in Windows 10, Manjaro and Parrot, so I'm not sure it works in macOS.
-The `advpass()` works well in Spyder, Windows cmd/powershell/terminal and Linux terminal.
+`advpass()` works well in Spyder, Windows cmd/powershell/terminal and most of the Linux terminals.
 Haven't tested it in PyCharm yet, so it might work.
 
 ### License
