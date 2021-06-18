@@ -11,7 +11,7 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install [maskpa
 pip install maskpass
 ```
 
-It is currently recommended to enforce a version if you have plans to use it in a project, since backward compatible changes may occur.
+It is currently recommended to enforce a version if you have plans to use it in a project, since backward incompatible changes may occur.
 
 ### Usage
 
