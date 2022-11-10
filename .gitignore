@@ -1,3 +1,4 @@
 build/
 dist/
 maskpass.egg-info/
+**/__pycache__/

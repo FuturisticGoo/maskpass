@@ -9,7 +9,7 @@ import sys
 from .cross_getch import CrossGetch
 
 
-def advpass(prompt="Enter Password: ", mask="*", ide=False, suppress=False):
+def advpass(prompt="Enter Password: ", mask="*", ide=False, suppress=True):
     """
     Description
     ----------
@@ -25,7 +25,7 @@ def advpass(prompt="Enter Password: ", mask="*", ide=False, suppress=False):
     ide : Pass True if getch or linux getch not supported like in Spyder
         DESCRIPTION. Default is False
     suppress : Pass True to stop QTConsole from jumping when Spacebar is pressed
-        DESCRIPTION. Default is False
+        DESCRIPTION. Default is True
     Raises
     ------
     KeyboardInterrupt
@@ -46,7 +46,18 @@ def advpass(prompt="Enter Password: ", mask="*", ide=False, suppress=False):
     count = 0
     mask_length = len(mask)
     password_input = ""
-    tty_check = sys.stdout.isatty() and not ide
+    try:
+        # Checking if we're running in IPython/QtConsole/Spyder
+        __IPYTHON__
+        import IPython
+        if(type(get_ipython())==IPython.terminal.interactiveshell.TerminalInteractiveShell):
+            # Means its IPython but in terminal, so tty_check is set to True
+            tty_check = True and not ide
+        else:
+            tty_check = False
+
+    except NameError:
+        tty_check = True and not ide
     ctrl_hold = False
 
     def on_press(key):

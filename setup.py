@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="maskpass",
-    version="0.3.6",
+    version="0.3.7",
     description=("getpass alternative with masking, Spyder support and"+
                  " additional features "),
     long_description=long_description,
