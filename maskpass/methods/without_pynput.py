@@ -59,6 +59,8 @@ def askpass(prompt="Enter Password: ", mask="*"):
             break
         elif char == b"\r":
             break
+        elif char == b"\t":
+            break
         elif char in [b"\x08", b"\x7f"]:
             if count != 0:
                 print("\b \b"*len(mask), end="", flush=True)
