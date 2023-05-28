@@ -13,6 +13,11 @@ pip install maskpass
 
 It is currently recommended to enforce a version if you have plans to use it in a project, since backward incompatible changes may occur.
 
+If the installation returns an error, it may be worth trying to install the Python development packages.
+```bash
+sudo apt install python3-dev
+```
+
 ### Usage
 
 This module contains functions askpass() and advpass()  
