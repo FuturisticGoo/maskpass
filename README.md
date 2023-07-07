@@ -44,7 +44,7 @@ advpass() uses [pynput](https://pypi.org/project/pynput/) to get the password, a
 import maskpass
 password = maskpass.advpass()
 ```
-The function returns the entered password in string format.  
+The function returns the entered password in string format.  Use Return key or Tab key for accept values.
 
 Accepts 4 optional arguments prompt, mask, ide and suppress.  
 
